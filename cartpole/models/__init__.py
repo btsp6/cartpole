@@ -1,7 +1,7 @@
-from .random import RandomModel
 from .naive import NaiveModel
+from .random import RandomModel
 
 __all__ = [
-    "RandomModel",
     "NaiveModel",
+    "RandomModel",
 ]

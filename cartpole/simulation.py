@@ -1,7 +1,8 @@
 import contextlib
-from typing import Iterator
+from collections.abc import Iterator
 
 import gymnasium as gym
+from gymnasium.envs.classic_control import CartPoleEnv
 from gymnasium.wrappers import RecordVideo
 
 from models import NaiveModel
@@ -9,13 +10,13 @@ from models import NaiveModel
 
 @contextlib.contextmanager
 def cartpole_env() -> Iterator[gym.Env]:
+	env = gym.make("CartPole-v1", render_mode="rgb_array")
+	env = RecordVideo(
+		env,
+		video_folder="videos/cartpole-agent",
+		episode_trigger=lambda x: True,
+	)
 	try:
-		env = gym.make("CartPole-v1", render_mode="rgb_array")
-		env = RecordVideo(
-			env,
-			video_folder="videos/cartpole-agent",
-			episode_trigger=lambda x: True,
-		)
 		yield env
 	finally:
 		env.close()
@@ -27,6 +28,7 @@ with cartpole_env() as env:
 
 	episode_over = False
 	while not episode_over:
+		assert isinstance(env.unwrapped, CartPoleEnv)
 		action = model.get_action(env.unwrapped)
 
 		obs, reward, terminated, truncated, info = env.step(action)
